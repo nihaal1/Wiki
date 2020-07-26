@@ -1,38 +1,81 @@
 from django.shortcuts import render
 from django import forms
-from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
+import markdown2
 
-#tasks = [] This is a global list, so anyone from any session can access it
+from . import util
 
-class NewTaskForm(forms.Form):
-    task = forms.CharField(label="New Task")
-    #priority = forms.IntegerField(label= "Priority", min_value=1, max_value=5)
 
-# Create your views here.
+class NewPageForm(forms.Form):
+    title = forms.CharField(label="Title")
+    
+    content = forms.CharField(label = "Md Content",widget=forms.Textarea)
+
+
+
+def home(request):
+    return render(request, "encyclopedia/home.html")
+
 
 def index(request):
-    if "tasks" not in request.session:
-        request.session["tasks"] = []
-    return render(request, "tasks/index.html", {
-       # "tasks" : tasks ##The variable tasks can no longer be used as it is commented out
-       "tasks" : request.session["tasks"]
+    return render(request, "encyclopedia/index.html", {
+        "entries": util.list_entries()
+        
     })
- 
-def add(request):
-    if request.method =="POST":
-        form = NewTaskForm(request.POST)
-        if form.is_valid():
-            task = form.cleaned_data["task"]
-            #tasks.append(task)
-            request.session["tasks"] += [task]
-            return HttpResponseRedirect(reverse("tasks:index")) ##DO NOT put space b/w "tasks" and :
-        else:
-            return render(request, "tasks/add.html", {
-                "form": form
-            })
 
-    return render(request,"tasks/add.html", {
-        "form" : NewTaskForm()
+def create(request):
+    #title = "Flask" 
+    #content = "#Flask"
+
+    if request.method == "POST":
+        page = NewPageForm(request.POST)
+        if page.is_valid():
+            
+            title = page.cleaned_data["title"]
+            title = title.capitalize()
+            content = page.cleaned_data["content"]
+
+            entries = util.list_entries()
+            for entry in entries:
+                if title == entry:
+                    return HttpResponse("Error - Page exists")
+                
+            else:
+                util.save_entry(title,content)
+        
+        else:
+            return HttpResponse("Error")
+        
+    return render(request,"encyclopedia/create.html",{
+        "page" : NewPageForm()
     })
+    
+# "util.save_entry(title,content)")
+
+
+
+'''
+    else:
+        return render(request, "encyclopedia/create.html")
+
+
+
+def pages(request,name):
+    return render(request,f"{name}.html" )
+'''
+
+
+def pages(request,name):
+    text = util.get_entry(f"{name}")
+
+    html = markdown2.markdown(text)
+    html_file = open(f"C://Users//USER//edX Lectures//2020//Projects//wiki//entries//{name}.html","w")
+    html_file.write(html)
+    html_file.close()
+    return render(request,f"{name}.html")
+
+
+
+
+
     
