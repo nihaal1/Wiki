@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django import forms
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect,Http404  
 from django.urls import reverse
 import markdown2
 
@@ -68,13 +68,21 @@ def pages(request,name):
 
 
 def pages(request,name):
-    text = util.get_entry(f"{name}")
 
-    html = markdown2.markdown(text)
-    html_file = open(f"C://Users//USER//edX Lectures//2020//Projects//wiki//encyclopedia//templates//{name}.html","w")
-    html_file.write(html)
-    html_file.close()
-    return render(request,f"{name}.html")
+    try:
+        text = util.get_entry(f"{name}")
+
+        html = markdown2.markdown(text)
+        html_file = open(f"C://Users//USER//edX Lectures//2020//Projects//wiki//encyclopedia//templates//{name}.html","w")
+        html_file.write(html)
+        html_file.close()
+        return render(request,f"{name}.html")
+
+    except:
+        
+        return render(request,"encyclopedia/error_repeat.html",{
+            "name" : name.capitalize()
+        })
 
 
 
