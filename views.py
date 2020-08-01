@@ -73,10 +73,16 @@ def pages(request,name):
         text = util.get_entry(f"{name}")
 
         html = markdown2.markdown(text)
-        html_file = open(f"encyclopedia/templates/{name}.html","w")
-        html_file.write(html)
-        html_file.close()
-        return render(request,f"{name}.html")
+
+        return render(request, "encyclopedia/get.html",{
+            "title" : name,
+            "html" : html
+        })
+
+        #html_file = open(f"encyclopedia/templates/{name}.html","w")
+        #html_file.write(html)
+        #html_file.close()
+        #return render(request,f"{name}.html")
 
     except:
         
