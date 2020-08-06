@@ -10,8 +10,10 @@ from . import util
 class NewPageForm(forms.Form):
     title = forms.CharField(label="Title")
     
-    content = forms.CharField(label = "Md Content",widget=forms.Textarea)
+    content = forms.CharField(label = "Md Content",widget=forms.Textarea())
 
+class Edit(forms.Form):
+    content = forms.CharField(label = "Md Content",widget=forms.Textarea())
 
 
 def home(request):
@@ -55,16 +57,22 @@ def create(request):
 # "util.save_entry(title,content)") 
 
 
+def edit(request,name):
 
-'''
-    else:
-        return render(request, "encyclopedia/create.html")
+    if request.method == "GET":
+        content = util.get_entry(f"{name}")
+
+        return render(request, "encyclopedia/edit.html",{ 
+        "content" : content
+        })
+
+    
+    return render(request, "encyclopedia/edit.html",{
+        "page" : Edit()
+        
+    })
 
 
-
-def pages(request,name):
-    return render(request,f"{name}.html" )
-'''
 
 
 def pages(request,name):
@@ -89,6 +97,7 @@ def pages(request,name):
         return render(request,"encyclopedia/error_repeat.html",{
             "name" : name.capitalize()
         })
+
 
 
 
