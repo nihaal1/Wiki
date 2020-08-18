@@ -27,9 +27,7 @@ def index(request):
     })
 
 def create(request):
-    #title = "Flask" 
-    #content = "#Flask"
-
+    
     if request.method == "POST":
         page = NewPageForm(request.POST)
         if page.is_valid():
@@ -54,23 +52,35 @@ def create(request):
         "page" : NewPageForm()
     })
     
-# "util.save_entry(title,content)") 
+
 
 
 def edit(request,name):
 
     if request.method == "GET":
         content = util.get_entry(f"{name}")
+          
+
 
         return render(request, "encyclopedia/edit.html",{ 
-        "content" : content
+        "content" : Edit(initial = {'content': content})        
+        
         })
 
-    
-    return render(request, "encyclopedia/edit.html",{
-        "page" : Edit()
-        
-    })
+    if request.method == "POST":
+        page = Edit(request.POST)
+        if page.is_valid():
+            title = f"{name}"
+            content = page.cleaned_data["content"]
+            util.save_entry(title,content)
+
+            text = util.get_entry(title)
+            html = markdown2.markdown(text)
+
+            return render(request, "encyclopedia/get.html",{
+                "title" : name,
+                "html" : html
+        })
 
 
 
@@ -86,11 +96,6 @@ def pages(request,name):
             "title" : name,
             "html" : html
         })
-
-        #html_file = open(f"encyclopedia/templates/{name}.html","w")
-        #html_file.write(html)
-        #html_file.close()
-        #return render(request,f"{name}.html")
 
     except:
         
