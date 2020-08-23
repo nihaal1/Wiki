@@ -11,10 +11,15 @@
     <body>
         <div class="row">
             <div class="sidebar col-lg-2 col-md-3">
-                <h2>Wiki</h2>
-                <form>
-                    <input class="search" type="text" name="q" placeholder="Search Encyclopedia">
+                <h2><b>Wiki</b></h2>
+
+
+                <form method="post" action="{% url 'index' %}">
+                    {% csrf_token %}
+                    {{search}}
+                    <input type="submit" >
                 </form>
+
                 <div>
                     <a href="{% url 'index' %}">Home</a>
                 </div>
@@ -35,3 +40,4 @@
 
     </body>
 </html>
+<input class="search" type="text" name="search" placeholder="Search Encyclopedia">
