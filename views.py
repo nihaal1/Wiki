@@ -43,12 +43,14 @@ def index(request):
                         "html" : html,
                         "search" : Search()
                     })
-                elif title.islower() in entry.islower():
+                    
+                if title.lower() in entry.lower():
                     search_list.append(entry)
+                    
 
             return render (request, "encyclopedia/search.html",{
-                        "search_list" : search_list,
-                        "search" : Search()
+                    "search_list" : search_list,
+                    "search" : Search()
                     })
     
     return render(request, "encyclopedia/index.html", {
