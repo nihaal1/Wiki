@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django import forms
 from django.http import HttpResponse,HttpResponseRedirect,Http404  
 from django.urls import reverse
+import random
 import markdown2
 
 from . import util
@@ -19,8 +20,6 @@ class Search(forms.Form):
     title = forms.CharField(widget=forms.TextInput(attrs={'class' : 'myfieldclass', 'placeholder': 'Search Encyclopedia'}))
 
 
-def home(request):
-    return render(request, "encyclopedia/home.html")
 
 
 def index(request):
@@ -143,8 +142,22 @@ def pages(request,name):
         })
 
 
+def random_page(request):
+    if request.method == "GET":
+        entries = util.list_entries()
 
+        n= random.randint(0,len(entries)-1)
+        random_page = entries[n]
 
+        text = util.get_entry(random_page)
+
+        html = markdown2.markdown(text)
+        
+    return render(request,"encyclopedia/get.html",{
+            "title" : random_page,
+            "html" : html,
+            "search" : Search()
+        })   
 
 
     
