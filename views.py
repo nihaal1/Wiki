@@ -15,15 +15,46 @@ class NewPageForm(forms.Form):
 class Edit(forms.Form):
     content = forms.CharField(label = "Md Content",widget=forms.Textarea())
 
+class Search(forms.Form):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class' : 'myfieldclass', 'placeholder': 'Search Encyclopedia'}))
+
 
 def home(request):
     return render(request, "encyclopedia/home.html")
 
 
 def index(request):
+    entries = util.list_entries()
+    search_list = []
+
+    if request.method == "POST":
+        search = Search(request.POST)
+        if search.is_valid():
+            title = search.cleaned_data["title"]
+            title = title.capitalize()
+
+            for entry in entries:
+                if title == entry:
+                    page = util.get_entry(title)
+                    html = markdown2.markdown(page)
+
+                    return render(request, "encyclopedia/get.html",{
+                        "title" : title,
+                        "html" : html,
+                        "search" : Search()
+                    })
+                elif title.islower() in entry.islower():
+                    search_list.append(entry)
+
+            return render (request, "encyclopedia/search.html",{
+                        "search_list" : search_list,
+                        "search" : Search()
+                    })
+    
     return render(request, "encyclopedia/index.html", {
-        "entries": util.list_entries()
-        
+        "entries": util.list_entries(),
+        "search" : Search()
+
     })
 
 def create(request):
@@ -49,7 +80,9 @@ def create(request):
             return HttpResponse("Error")
         
     return render(request,"encyclopedia/create.html",{
-        "page" : NewPageForm()
+        "page" : NewPageForm(),
+        "search" : Search()
+
     })
     
 
@@ -63,7 +96,8 @@ def edit(request,name):
 
 
         return render(request, "encyclopedia/edit.html",{ 
-        "content" : Edit(initial = {'content': content})        
+        "content" : Edit(initial = {'content': content}),
+        "search" : Search()       
         
         })
 
@@ -79,7 +113,8 @@ def edit(request,name):
 
             return render(request, "encyclopedia/get.html",{
                 "title" : name,
-                "html" : html
+                "html" : html,
+                "search" : Search()
         })
 
 
@@ -94,13 +129,15 @@ def pages(request,name):
 
         return render(request, "encyclopedia/get.html",{
             "title" : name,
-            "html" : html
+            "html" : html,
+            "search" : Search()
         })
 
     except:
         
         return render(request,"encyclopedia/error_repeat.html",{
-            "name" : name.capitalize()
+            "name" : name.capitalize(),
+            "search" : Search()
         })
 
 
