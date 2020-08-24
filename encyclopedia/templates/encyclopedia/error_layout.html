@@ -11,17 +11,12 @@
     <body>
         <div class="row">
             <div class="sidebar col-lg-2 col-md-3">
-                <h2><b>Wiki</b></h2>
-
-
-                <form method="post" action="{% url 'index' %}">
-                    {% csrf_token %}
-                    {{search}}
-                    <input type="submit" >
+                <h2>Wiki</h2>
+                <form>
+                    <input class="search" type="text" name="q" placeholder="Search Encyclopedia">
                 </form>
-
                 <div>
-                    <a href="{% url 'index' %}">Home</a>
+                    <a href="{% url 'home' %}">Home</a>
                 </div>
                 <div>
                   <a href="{% url 'create' %}">Create New Page</a>
@@ -34,10 +29,10 @@
             </div>
             <div class="main col-lg-10 col-md-9">
                 {% block body %}
+
                 {% endblock %}
             </div>
         </div>
 
     </body>
 </html>
-<input class="search" type="text" name="search" placeholder="Search Encyclopedia">
